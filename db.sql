@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS blog_server;
+
+CREATE TABLE IF NOT EXISTS users(
+    id SERIAL PRIMARY KEY,
+    firstname VARCHAR(60) NOT NULL,
+    lastname VARCHAR(60) NOT NULL,
+    username VARCHAR(60) NOT NULL,
+    email VARCHAR(80) NOT NULL,
+    password VARCHAR(60) NOT NULL
+);
