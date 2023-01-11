@@ -22,12 +22,9 @@ const login = async (req, res, next) => {
       throw new CustomError(404, "Incorrect password!");
     }
 
-    const token = await jwt.sign({ id: foundUser.id }, config.app.jwt_secret, {
-      expiresIn: "60s",
-    });
+    const token = jwt.sign({ id: foundUser.id }, config.app.jwt_secret);
     res.status(200).json({
       message: "Successfully logged in!",
-      user: foundUser,
       token,
     });
   } catch (error) {
@@ -37,7 +34,7 @@ const login = async (req, res, next) => {
 
 const register = async (req, res, next) => {
   try {
-    const { firstname, lastname, username, email, password } = req.body;
+    const { username, email, password } = req.body;
     const users = await db.getUsers();
     const foundUser = await users.find(
       (user) => user.username === username || user.email === email
@@ -45,21 +42,14 @@ const register = async (req, res, next) => {
     if (foundUser) {
       throw new CustomError(
         404,
-        "There is user with this credentials! Enter another username or email!"
+        "There is a user with this credentials! Enter another username or email!"
       );
     }
 
     const userId = crypto.randomBytes(16).toString("hex");
     const hashedPassword = await bcrypt.hash(password, Number(config.app.salt));
-    const user = await db.registerUser(
-      userId,
-      firstname,
-      lastname,
-      username,
-      email,
-      hashedPassword
-    );
-    res.status(201).json({ message: "Registered successffully!", user });
+    const data = await db.registerUser(userId, username, email, hashedPassword);
+    res.status(201).json({ message: "Registered successffully!", data });
   } catch (error) {
     next(error);
   }

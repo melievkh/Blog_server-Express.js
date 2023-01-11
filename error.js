@@ -11,3 +11,11 @@ module.exports.errorHandler = (err, req, res, next) => {
     res.json({ message });
   }
 };
+
+module.exports.invalidRoute = (req, res, next) => {
+  try {
+    throw new CustomError(404, "Invalid route!");
+  } catch (error) {
+    next(error);
+  }
+};

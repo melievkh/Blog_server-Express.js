@@ -2,18 +2,15 @@ const jwt = require("jsonwebtoken");
 const { config } = require("../config");
 const CustomError = require("../customError");
 
-module.exports.authentication = async (req, res, next) => {
+module.exports.authentication = (req, res, next) => {
   try {
-    const authHeader = req.header["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-
+    const token = req.headers.authorization.split(" ")[1];
     if (!token) {
-      throw new CustomError(404, "You should login first!");
+      throw new CustomError(401, "You should login first");
     }
 
-    const { id } = jwt.verify(token, config.app.jwt_secret);
+    const { id } = jwt.verify(token, config.app.jwtSecret);
     req.userId = id;
-
     next();
   } catch (error) {
     next(error);
